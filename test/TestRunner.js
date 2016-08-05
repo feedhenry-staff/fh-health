@@ -1,4 +1,5 @@
 var assert = require('assert')
+  , TestEvents = require('../lib/TestEvents')
   , TestRunner = require('../lib/TestRunner');
 
 
@@ -55,6 +56,10 @@ describe('TestRunner', function() {
   });
 
   describe('Test init will add test to an exports object', function() {
+    beforeEach(function(){
+      TestEvents.removeAllListeners();
+    });
+
     it('Should run tests', function(done) {
       var fake_nodeapp = {}
       TestRunner.init(fake_nodeapp);
@@ -204,6 +209,20 @@ describe('TestRunner', function() {
 
       TestRunner.runTests(cb1);
       TestRunner.runTests(cb2);
+    });
+
+    it('should not print EventEmitter memory leak warning', function(done) {
+      var NUMER_OF_TESTS = 11;
+      for(var i = 0; i< NUMER_OF_TESTS; i++) {
+        TestRunner.addTest('Run the fake test #' + i, passingTest);
+      }
+
+      function cb(err) {
+        assert(!err);
+        done();
+      }
+
+      TestRunner.runTests(cb);
     });
   });
 });
